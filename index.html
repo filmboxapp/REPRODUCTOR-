@@ -28,10 +28,10 @@
             
             <!-- TMDB Fetcher -->
             <div class="mb-8">
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">TMDB Content Lookup</label>
+                <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-3">System Lookup</label>
                 <div class="flex gap-2">
-                    <input type="text" id="tmdbId" placeholder="ID de la película" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
-                    <button onclick="fetchTMDB()" class="bg-white hover:bg-zinc-200 text-black px-6 rounded-2xl text-sm font-semibold transition">Sync</button>
+                    <input type="text" id="tmdbId" placeholder="TMDB ID" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
+                    <button onclick="fetchTMDB()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 rounded-2xl text-sm font-semibold transition">Sync</button>
                 </div>
             </div>
 
@@ -39,20 +39,20 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Movie Title</label>
-                    <input type="text" id="title" placeholder="Título original" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
+                    <input type="text" id="title" placeholder="Título" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Poster URL</label>
-                    <input type="text" id="poster" placeholder="URL de la imagen" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
+                    <input type="text" id="poster" placeholder="URL del póster" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">Source (M3U8)</label>
-                    <input type="text" id="videoUrl" placeholder="URL del stream" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
+                    <label class="block text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">M3U8 Stream Source</label>
+                    <input type="text" id="videoUrl" placeholder="URL del video" class="w-full input-minimal p-4 rounded-2xl text-sm text-zinc-300">
                 </div>
             </div>
 
-            <button onclick="generateLink()" class="w-full mt-10 bg-indigo-600 hover:bg-indigo-500 text-white py-4 rounded-2xl font-medium tracking-wide transition transform hover:scale-[1.01] active:scale-[0.99]">
-                GENERATE LINK
+            <button onclick="generateLink()" class="w-full mt-10 bg-white hover:bg-zinc-200 text-black py-4 rounded-2xl font-medium tracking-wide transition transform hover:scale-[1.01] active:scale-[0.99]">
+                GENERATE EMBED
             </button>
         </div>
 
@@ -65,8 +65,9 @@
     </div>
 
     <script>
-        const TMDB_API_KEY = "38e497c6c1a043d1341416e80915669f";
-        const JW_PLAYER_KEY = "W7zSm81+mmIsg7F+fyHRKhF3ggLkTqtGMhvI92kbqf/ysE99";</script>";
+        const TMDB_API_KEY = "38e497c6c1a043d1341416e80915669f"; 
+        const JW_PLAYER_LIB = "https://content.jwplatform.com/libraries/KB5zFt7A.js";
+        const JW_PLAYER_KEY = "W7zSm81+mmIsg7F+fyHRKhF3ggLkTqtGMhvI92kbqf/ysE99";
 
         async function fetchTMDB() {
             const id = document.getElementById('tmdbId').value;
@@ -88,8 +89,7 @@
             const params = new URLSearchParams({
                 title: document.getElementById('title').value,
                 poster: document.getElementById('poster').value,
-                video: document.getElementById('videoUrl').value,
-                jw: JW_PLAYER_KEY
+                video: document.getElementById('videoUrl').value
             });
             const base = window.location.origin + window.location.pathname;
             document.getElementById('finalLink').value = `${base.replace('index.html', '')}player.html?${params.toString()}`;
