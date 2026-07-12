@@ -1,60 +1,704 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FILMBOX Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FILMBOX - Generador de Reproductor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<link rel="stylesheet" href="style.css">
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e50914;
+            text-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .panel {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid rgba(229, 9, 20, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            color: #e50914;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: rgba(229, 9, 20, 0.1);
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            color: #e50914;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #e50914;
+            color: #fff;
+            border-color: #e50914;
+        }
+
+        .tab-btn:hover {
+            border-color: #e50914;
+            background: rgba(229, 9, 20, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e50914;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(229, 9, 20, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: rgba(229, 9, 20, 0.1);
+            border-color: #e50914;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .search-results {
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(229, 9, 20, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .search-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(229, 9, 20, 0.05);
+            border: 1px solid rgba(229, 9, 20, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-item:hover {
+            background: rgba(229, 9, 20, 0.15);
+            border-color: #e50914;
+        }
+
+        .search-item img {
+            width: 40px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .search-item-info {
+            flex: 1;
+        }
+
+        .search-item-title {
+            color: #e50914;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .search-item-year {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 13px;
+            background: linear-gradient(135deg, #e50914 0%, #c40812 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: rgba(229, 9, 20, 0.1);
+            color: #e50914;
+            border: 2px solid #e50914;
+        }
+
+        .button-secondary:hover {
+            background: rgba(229, 9, 20, 0.2);
+        }
+
+        .preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            z-index: 2;
+        }
+
+        .preview-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .preview-badge {
+            display: inline-block;
+            background: #e50914;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+            width: fit-content;
+        }
+
+        .preview-subtitle {
+            display: inline-block;
+            color: #ccc;
+            padding: 5px 0;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(229, 9, 20, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            font-size: 40px;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.6);
+        }
+
+        .no-preview {
+            text-align: center;
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4caf50;
+            color: #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: center;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-box {
+            background: rgba(229, 9, 20, 0.1);
+            border: 2px solid #e50914;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .result-label {
+            color: #e50914;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .result-link {
+            background: rgba(0, 0, 0, 0.5);
+            color: #4caf50;
+            padding: 12px;
+            border-radius: 6px;
+            word-break: break-all;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tmdb-selected {
+            background: rgba(229, 9, 20, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .tmdb-selected-label {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .tmdb-selected-title {
+            color: #e50914;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .preview {
+                height: 300px;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .preview-title {
+                font-size: 24px;
+            }
+        }
+
+        .scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(229, 9, 20, 0.3);
+            border-radius: 3px;
+        }
+
+        .scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(229, 9, 20, 0.5);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #e50914;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            border-top-color: #e50914;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <div class="logo">🎬 FILMBOX</div>
+            <div class="subtitle">Generador Profesional de Reproductor</div>
+        </header>
 
-<div class="container">
+        <div class="main-content">
+            <!-- Panel Izquierdo -->
+            <div class="panel">
+                <h2>Crear Reproductor</h2>
 
-<h1>FILMBOX PLAYER GENERATOR</h1>
+                <div class="success-message" id="successMsg">✓ ¡Reproductor generado exitosamente!</div>
 
-<div class="tabs">
-<button onclick="setMode('tmdb')">TMDB</button>
-<button onclick="setMode('manual')">Manual</button>
-</div>
+                <!-- Tabs -->
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('manual')">✍️ Manual</button>
+                    <button class="tab-btn" onclick="switchTab('tmdb')">🔍 TMDB</button>
+                </div>
 
-<div id="tmdb-mode">
+                <!-- TAB MANUAL -->
+                <div id="manual" class="tab-content active">
+                    <div class="form-group">
+                        <label>Título de la película/serie</label>
+                        <input type="text" id="manual-titulo" placeholder="Ej: Moana" oninput="updatePreview()">
+                    </div>
 
-<input
-type="text"
-id="search"
-placeholder="Buscar película o serie">
+                    <div class="form-group">
+                        <label>URL del Póster</label>
+                        <input type="text" id="manual-poster" placeholder="https://image.tmdb.org/..." oninput="updatePreview()">
+                    </div>
 
-<div id="results"></div>
+                    <div class="form-group">
+                        <label>URL del Video</label>
+                        <input type="text" id="manual-video" placeholder="https://video-url.com/video.mp4">
+                    </div>
+                </div>
 
-<input
-type="text"
-id="video-url"
-placeholder="URL del video">
+                <!-- TAB TMDB -->
+                <div id="tmdb" class="tab-content">
+                    <div class="form-group">
+                        <label>Buscar película o serie</label>
+                        <input type="text" id="tmdb-search" placeholder="Escribe el nombre..." autocomplete="off">
+                        <div class="loading" id="tmdbLoading">
+                            <div class="spinner"></div> Buscando...
+                        </div>
+                        <div id="tmdb-results" class="search-results scrollbar"></div>
+                    </div>
 
-</div>
+                    <div class="form-group">
+                        <label>URL del Video</label>
+                        <input type="text" id="tmdb-video" placeholder="https://video-url.com/video.mp4">
+                    </div>
 
-<div id="manual-mode" style="display:none">
+                    <div id="tmdb-selected" class="tmdb-selected">
+                        <div class="tmdb-selected-label">📺 Seleccionado</div>
+                        <div class="tmdb-selected-title" id="tmdb-selected-title"></div>
+                    </div>
+                </div>
 
-<input id="title" placeholder="Título">
+                <!-- Botones -->
+                <div class="buttons">
+                    <button onclick="generarReproductor()">Generar Reproductor</button>
+                </div>
 
-<input id="poster" placeholder="Poster URL">
+                <!-- Resultado -->
+                <div class="result-box" id="resultBox">
+                    <div class="result-label">📎 Link Directo del Reproductor</div>
+                    <div class="result-link" id="resultLink"></div>
+                    <button class="button-secondary" onclick="copiarEnlace()">📋 Copiar Enlace</button>
+                </div>
+            </div>
 
-<input id="backdrop" placeholder="Backdrop URL">
+            <!-- Panel Derecho - Preview -->
+            <div class="preview" id="preview">
+                <div class="no-preview">Completa los datos para ver la vista previa</div>
+                <img id="previewImg" class="preview-image" style="display: none;">
+                <div class="play-icon" style="display: none;" id="playIcon">▶</div>
+                <div class="preview-overlay" style="display: none;" id="previewOverlay">
+                    <div class="preview-subtitle">ESTÁS VIENDO</div>
+                    <div class="preview-title" id="previewTitle"></div>
+                    <div class="preview-badge">FILMBOX</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<input id="manual-video" placeholder="Video URL">
+    <script>
+        const TMDB_API_KEY = "38e497c6c1a043d1341416e80915669f";
+        let selectedTmdbData = null;
+        let currentTab = 'manual';
+        let tmdbSearchTimeout;
 
-</div>
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            selectedTmdbData = null;
+            document.getElementById('tmdb-selected').style.display = 'none';
+            updatePreview();
+        }
 
-<button onclick="generateLink()">
-GENERAR LINK
-</button>
+        function toBase64UTF8(str) {
+            const encoder = new TextEncoder();
+            const bytes = encoder.encode(str);
+            let binary = "";
+            bytes.forEach(b => binary += String.fromCharCode(b));
+            return btoa(binary);
+        }
 
-<div id="output"></div>
+        document.getElementById("tmdb-search").addEventListener("input", function() {
+            const query = this.value.trim();
+            clearTimeout(tmdbSearchTimeout);
+            
+            if (!query) {
+                document.getElementById("tmdb-results").innerHTML = "";
+                document.getElementById("tmdbLoading").style.display = "none";
+                return;
+            }
 
-</div>
+            document.getElementById("tmdbLoading").style.display = "block";
 
-<script src="app.js"></script>
+            tmdbSearchTimeout = setTimeout(() => {
+                fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_API_KEY}&language=es-MX&query=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("tmdbLoading").style.display = "none";
+                        const results = data.results || [];
+                        let html = "";
+                        
+                        results.forEach(item => {
+                            if ((item.media_type === "movie" || item.media_type === "tv") && item.poster_path) {
+                                const titulo = item.title || item.name;
+                                const fecha = item.release_date || item.first_air_date || "";
+                                const year = fecha.split("-")[0];
+                                const poster = `https://image.tmdb.org/t/p/w200${item.poster_path}`;
+                                const backdrop = item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : poster;
 
+                                html += `
+                                    <div class="search-item" onclick="selectTmdbItem('${titulo.replace(/'/g, "&apos;")}', '${backdrop}', '${poster}')">
+                                        <img src="${poster}" alt="${titulo}">
+                                        <div class="search-item-info">
+                                            <div class="search-item-title">${titulo}</div>
+                                            <div class="search-item-year">${year}</div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        document.getElementById("tmdb-results").innerHTML = html || "<div style='color: #aaa; padding: 10px;'>No se encontraron resultados</div>";
+                    })
+                    .catch(err => {
+                        document.getElementById("tmdbLoading").style.display = "none";
+                        console.error(err);
+                    });
+            }, 500);
+        });
+
+        function selectTmdbItem(titulo, backdrop, poster) {
+            selectedTmdbData = { titulo, backdrop, poster };
+            document.getElementById("tmdb-results").innerHTML = "";
+            document.getElementById("tmdb-search").value = titulo;
+            document.getElementById("tmdb-selected-title").textContent = titulo;
+            document.getElementById("tmdb-selected").style.display = "block";
+            updatePreview();
+        }
+
+        function updatePreview() {
+            let titulo = "";
+            let poster = "";
+
+            if (currentTab === "manual") {
+                titulo = document.getElementById("manual-titulo").value.trim();
+                poster = document.getElementById("manual-poster").value.trim();
+            } else {
+                if (selectedTmdbData) {
+                    titulo = selectedTmdbData.titulo;
+                    poster = selectedTmdbData.backdrop;
+                }
+            }
+
+            const previewImg = document.getElementById("previewImg");
+            const playIcon = document.getElementById("playIcon");
+            const previewOverlay = document.getElementById("previewOverlay");
+            const previewTitle = document.getElementById("previewTitle");
+            const noPreview = document.querySelector(".no-preview");
+
+            if (titulo && poster) {
+                previewImg.src = poster;
+                previewImg.style.display = "block";
+                playIcon.style.display = "flex";
+                previewOverlay.style.display = "flex";
+                previewTitle.textContent = titulo;
+                if (noPreview) noPreview.style.display = "none";
+            } else {
+                previewImg.style.display = "none";
+                playIcon.style.display = "none";
+                previewOverlay.style.display = "none";
+                if (noPreview) noPreview.style.display = "block";
+            }
+        }
+
+        function generarReproductor() {
+            let titulo = "";
+            let poster = "";
+            let video = "";
+
+            if (currentTab === "manual") {
+                titulo = document.getElementById("manual-titulo").value.trim();
+                poster = document.getElementById("manual-poster").value.trim();
+                video = document.getElementById("manual-video").value.trim();
+
+                if (!titulo || !poster || !video) {
+                    alert("⚠️ Completa todos los campos del formulario manual");
+                    return;
+                }
+            } else {
+                video = document.getElementById("tmdb-video").value.trim();
+
+                if (!selectedTmdbData || !video) {
+                    alert("⚠️ Selecciona una película/serie y añade la URL del video");
+                    return;
+                }
+
+                titulo = selectedTmdbData.titulo;
+                poster = selectedTmdbData.backdrop;
+            }
+
+            const v = toBase64UTF8(video);
+            const t = toBase64UTF8(titulo);
+            const p = toBase64UTF8(poster);
+
+            const enlace = `player.html?video=${v}&poster=${p}&title=${t}`;
+
+            document.getElementById("resultLink").textContent = enlace;
+            document.getElementById("resultBox").style.display = "block";
+            document.getElementById("successMsg").style.display = "block";
+
+            setTimeout(() => {
+                document.getElementById("successMsg").style.display = "none";
+            }, 4000);
+        }
+
+        function copiarEnlace() {
+            const enlace = document.getElementById("resultLink").textContent;
+            navigator.clipboard.writeText(enlace).then(() => {
+                alert("✓ Enlace copiado al portapapeles");
+            }).catch(() => {
+                alert("⚠️ Error al copiar");
+            });
+        }
+    </script>
 </body>
-</html>
+  </html>
