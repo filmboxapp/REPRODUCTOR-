@@ -1,45 +1,95 @@
-const TMDB_KEY = "38e497c6c1a043d1341416e80915669f";
+const API_KEY="38e497c6c1a043d1341416e80915669f";
 
-let mode = "tmdb";
+let selectedMovie=null;
 
-function setMode(m){
+document
+.getElementById("search")
+.addEventListener("input",async e=>{
 
-mode = m;
+const query=e.target.value;
 
-document.getElementById("tmdb-mode").style.display =
-m==="tmdb" ? "block":"none";
+if(query.length<2)return;
 
-document.getElementById("manual-mode").style.display =
-m==="manual" ? "block":"none";
+const res=await fetch(
+`https://api.themoviedb.org/3/search/multi?api_key=${API_KEY}&language=es-MX&query=${encodeURIComponent(query)}`
+);
+
+const data=await res.json();
+
+let html="";
+
+data.results.forEach(item=>{
+
+if(!item.poster_path)return;
+
+html+=`
+<div class="card"
+onclick='selectMovie(${JSON.stringify(item)})'>
+
+<img src="https://image.tmdb.org/t/p/w300${item.poster_path}">
+
+<span>${item.title||item.name}</span>
+
+</div>
+`;
+
+});
+
+document.getElementById("results").innerHTML=html;
+
+});
+
+function selectMovie(movie){
+
+selectedMovie=movie;
+
+alert(
+(movie.title||movie.name)+" seleccionada"
+);
 
 }
 
-async function generateLink(){
+function setMode(mode){
 
-if(mode==="tmdb"){
+document.getElementById("tmdb-mode").style.display=
+mode==="tmdb"?"block":"none";
 
-const id =
-document.getElementById("tmdb-id").value;
+document.getElementById("manual-mode").style.display=
+mode==="manual"?"block":"none";
 
-const video =
-document.getElementById("video-url").value;
+}
 
-const data =
-await fetch(
-`https://api.themoviedb.org/3/movie/${id}?api_key=${TMDB_KEY}&language=es-MX`
+function generateLink(){
+
+if(selectedMovie){
+
+const title=
+encodeURIComponent(
+selectedMovie.title||selectedMovie.name
 );
 
-const movie =
-await data.json();
+const poster=
+encodeURIComponent(
+"https://image.tmdb.org/t/p/original"+
+selectedMovie.poster_path
+);
 
-const link =
-`player.html?title=${encodeURIComponent(movie.title)}
-&poster=https://image.tmdb.org/t/p/original${movie.poster_path}
-&backdrop=https://image.tmdb.org/t/p/original${movie.backdrop_path}
-&video=${encodeURIComponent(video)}`;
+const backdrop=
+encodeURIComponent(
+"https://image.tmdb.org/t/p/original"+
+selectedMovie.backdrop_path
+);
 
-document.getElementById("result").innerHTML =
-`<a href="${link}" target="_blank">${link}</a>`;
+const video=
+encodeURIComponent(
+document.getElementById("video-url").value
+);
+
+const link=
+`player.html?title=${title}&poster=${poster}&backdrop=${backdrop}&video=${video}`;
+
+document.getElementById("output")
+.innerHTML=`<a href="${link}" target="_blank">${link}</a>`;
 
 }
 
