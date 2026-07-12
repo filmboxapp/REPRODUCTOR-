@@ -5,42 +5,52 @@
 
 <meta charset="UTF-8">
 
-<title>FILMBOX</title>
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1">
 
-<script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+<title>FILMBOX PLAYER</title>
+
+<script src="https://cdn.jwplayer.com/libraries/TU_LIBRARY_ID.js"></script>
 
 <style>
 
+html,
 body{
 margin:0;
-background:black;
-font-family:Arial;
+width:100%;
+height:100%;
+background:#000;
+overflow:hidden;
 }
 
 #player{
-width:100%;
+position:fixed;
+inset:0;
+width:100vw;
 height:100vh;
 }
 
-.top{
+.info{
 
 position:absolute;
-z-index:999;
 
 top:15px;
 left:15px;
 
-color:white;
+z-index:9999;
 }
 
 .brand{
 color:#e50914;
+font-size:13px;
 font-weight:bold;
 }
 
 .title{
-font-size:22px;
-font-weight:bold;
+font-size:30px;
+font-weight:700;
+color:white;
 }
 
 </style>
@@ -49,14 +59,16 @@ font-weight:bold;
 
 <body>
 
-<div class="top">
+<div class="info">
 
 <div class="brand">
 Estas viendo FILMBOX
 </div>
 
-<div id="movieTitle"
-class="title"></div>
+<div
+id="movieTitle"
+class="title">
+</div>
 
 </div>
 
@@ -64,37 +76,43 @@ class="title"></div>
 
 <script>
 
-const params =
+const params=
 new URLSearchParams(location.search);
 
-const title =
+const title=
 params.get("title");
 
-const poster =
+const poster=
 params.get("poster");
 
-const video =
+const backdrop=
+params.get("backdrop");
+
+const video=
 params.get("video");
 
-document.getElementById(
-"movieTitle"
-).innerText = title;
+document
+.getElementById("movieTitle")
+.innerText=title;
 
 jwplayer("player").setup({
 
 file:video,
 
-image:poster,
-
-autostart:false,
+image:backdrop,
 
 width:"100%",
 
-height:"100%"
+height:"100%",
+
+stretching:"fill",
+
+autostart:false
 
 });
 
 </script>
 
 </body>
+
 </html>
