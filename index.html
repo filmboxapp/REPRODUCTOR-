@@ -42,6 +42,46 @@
             font-size: 14px;
         }
 
+        .domain-config {
+            background: rgba(229, 9, 20, 0.1);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .domain-config label {
+            color: #e50914;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .domain-config input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(229, 9, 20, 0.2);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .domain-config input:focus {
+            outline: none;
+            background: rgba(229, 9, 20, 0.1);
+            border-color: #e50914;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
+        }
+
+        .domain-config input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -452,6 +492,13 @@
             <div class="subtitle">Generador Profesional de Reproductor</div>
         </header>
 
+        <!-- Configuración de Dominio -->
+        <div class="domain-config">
+            <label>📍 URL Base (Dominio):</label>
+            <input type="text" id="baseDomain" placeholder="Ej: https://tudominio.com o https://usuario.github.io/repositorio" value="">
+            <small style="color: #aaa; display: block; margin-top: 8px;">Esta URL se agregará automáticamente al enlace generado</small>
+        </div>
+
         <div class="main-content">
             <!-- Panel Izquierdo -->
             <div class="panel">
@@ -537,6 +584,14 @@
         let selectedTmdbData = null;
         let currentTab = 'manual';
         let tmdbSearchTimeout;
+
+        // Detectar dominio automáticamente si no está configurado
+        window.addEventListener('load', function() {
+            const baseDomainInput = document.getElementById('baseDomain');
+            if (!baseDomainInput.value) {
+                baseDomainInput.value = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+            }
+        });
 
         function switchTab(tab) {
             currentTab = tab;
@@ -654,6 +709,12 @@
             let titulo = "";
             let poster = "";
             let video = "";
+            const baseDomain = document.getElementById('baseDomain').value.trim();
+
+            if (!baseDomain) {
+                alert("⚠️ Configura la URL base (Dominio)");
+                return;
+            }
 
             if (currentTab === "manual") {
                 titulo = document.getElementById("manual-titulo").value.trim();
@@ -680,7 +741,13 @@
             const t = toBase64UTF8(titulo);
             const p = toBase64UTF8(poster);
 
-            const enlace = `player.html?video=${v}&poster=${p}&title=${t}`;
+            // Construir URL con dominio base
+            let baseUrl = baseDomain;
+            if (!baseUrl.endsWith('/')) {
+                baseUrl += '/';
+            }
+
+            const enlace = baseUrl + `player.html?video=${v}&poster=${p}&title=${t}`;
 
             document.getElementById("resultLink").textContent = enlace;
             document.getElementById("resultBox").style.display = "block";
@@ -694,11 +761,11 @@
         function copiarEnlace() {
             const enlace = document.getElementById("resultLink").textContent;
             navigator.clipboard.writeText(enlace).then(() => {
-                alert("✓ Enlace copiado al portapapeles");
+                alert("✓ Enlace copiado al portapapeles:\n" + enlace);
             }).catch(() => {
                 alert("⚠️ Error al copiar");
             });
         }
     </script>
 </body>
-  </html>
+</html>
