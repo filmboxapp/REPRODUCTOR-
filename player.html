@@ -24,7 +24,7 @@
             content-visibility: hidden !important;
         }
         .jw-title-secondary.jw-reset-text {
-            color: #fff !important;
+            color: #e50914 !important;
         }
 
         @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@500;700&display=swap");
@@ -185,7 +185,7 @@
             -webkit-box-direction: normal;
             -ms-flex-direction: column;
             flex-direction: column;
-            color: var(--bg-white);
+            color: var(--bg-red);
             margin: -6rem 0 0 5rem;
             font-family: "Rubik", Arial, sans-serif;
             font-weight: 500;
@@ -213,6 +213,7 @@
             justify-content: flex-start;
             margin: -2.6rem 0 0 2.5rem;
             font-size: 0.8rem;
+            color: var(--bg-red);
         }
 
         .jwplayer.jw-skin-netflix.jw-breakpoint-3 .jw-title-primary,
@@ -237,6 +238,7 @@
             justify-content: flex-start;
             margin: -5rem 0 0 2.5rem;
             font-size: 1.5rem;
+            color: var(--bg-red);
         }
 
         .jwplayer.jw-skin-netflix.jw-breakpoint-5 .jw-title-primary,
@@ -261,6 +263,7 @@
             justify-content: flex-start;
             margin: -6rem 0 0 2.5rem;
             font-size: 1.5rem;
+            color: var(--bg-red);
         }
 
         .jwplayer.jw-skin-netflix.jw-breakpoint-7 .jw-title-primary,
@@ -285,6 +288,7 @@
             justify-content: flex-start;
             margin: -7rem 0 0 2.5rem;
             font-size: 2rem;
+            color: var(--bg-red);
         }
 
         .jwplayer.jw-skin-netflix.jw-state-idle .jw-display-icon-container .jw-svg-icon-play path {
@@ -509,10 +513,6 @@
             width: 100% !important;
             height: 100% !important;
         }
-
-        .custom-subtitle {
-            color: #e50914 !important;
-        }
     </style>
 </head>
 <body>
@@ -564,7 +564,7 @@ const playerInstance = jwplayer("player").setup({
     displaytitle: true,
     displaydescription: true,
     skin: { name: "netflix" },
-    autostart: true,
+    autostart: false,
     mute: false,
     logo: false,
     captions: {
@@ -590,12 +590,6 @@ const playerInstance = jwplayer("player").setup({
 playerInstance.on("ready", function () {
     const playerContainer = playerInstance.getContainer();
     
-    // Cambiar color del subtítulo a rojo
-    const titleSecondary = playerContainer.querySelector(".jw-title-secondary");
-    if (titleSecondary) {
-        titleSecondary.style.color = "#e50914";
-    }
-    
     // Remover botón next
     const nextContainer = playerContainer.querySelector(".jw-display-icon-next");
     if (nextContainer) {
@@ -607,23 +601,36 @@ playerInstance.on("ready", function () {
     if (rewindContainer) {
         const forwardContainer = rewindContainer.cloneNode(true);
         const forwardDisplayButton = forwardContainer.querySelector(".jw-icon-rewind");
-        forwardDisplayButton.style.transform = "scaleX(-1)";
-        forwardDisplayButton.ariaLabel = "Adelantar 10 segundos";
-        const displayControls = playerContainer.querySelector(".jw-display-controls");
-        displayControls.appendChild(forwardContainer);
+        if (forwardDisplayButton) {
+            forwardDisplayButton.style.transform = "scaleX(-1)";
+            forwardDisplayButton.ariaLabel = "Adelantar 10 segundos";
+            
+            const displayControls = playerContainer.querySelector(".jw-display-controls");
+            if (displayControls) {
+                displayControls.appendChild(forwardContainer);
+            }
+            
+            forwardDisplayButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                playerInstance.seek(playerInstance.getPosition() + 10);
+            });
+        }
         
         const buttonContainer = playerContainer.querySelector(".jw-button-container");
-        const rewindControlBarButton = buttonContainer.querySelector(".jw-icon-rewind");
-        const forwardControlBarButton = rewindControlBarButton.cloneNode(true);
-        forwardControlBarButton.style.transform = "scaleX(-1)";
-        forwardControlBarButton.ariaLabel = "Adelantar 10 segundos";
-        rewindControlBarButton.parentNode.insertBefore(forwardControlBarButton, rewindControlBarButton.nextElementSibling);
-        
-        [forwardDisplayButton, forwardControlBarButton].forEach((button) => {
-            button.onclick = () => {
-                playerInstance.seek(playerInstance.getPosition() + 10);
-            };
-        });
+        if (buttonContainer) {
+            const rewindControlBarButton = buttonContainer.querySelector(".jw-icon-rewind");
+            if (rewindControlBarButton) {
+                const forwardControlBarButton = rewindControlBarButton.cloneNode(true);
+                forwardControlBarButton.style.transform = "scaleX(-1)";
+                forwardControlBarButton.ariaLabel = "Adelantar 10 segundos";
+                rewindControlBarButton.parentNode.insertBefore(forwardControlBarButton, rewindControlBarButton.nextElementSibling);
+                
+                forwardControlBarButton.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playerInstance.seek(playerInstance.getPosition() + 10);
+                });
+            }
+        }
     }
 });
 
@@ -632,13 +639,6 @@ playerInstance.on('firstFrame', function () {
     if (savedTime && savedTime > 0) {
         console.log('Reanudando desde:', prettySecond(savedTime));
         playerInstance.seek(savedTime);
-        playerInstance.play().catch((err) => {
-            console.error('Error al intentar reproducir automáticamente:', err);
-            document.getElementById('autoplay-message').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('autoplay-message').style.display = 'none';
-            }, 5000);
-        });
     }
 });
 
@@ -667,13 +667,8 @@ playerInstance.on('error', (e) => {
     alert('Error al cargar el video: ' + e.message);
 });
 
-let hasEnteredFullscreen = false;
 playerInstance.on('play', function () {
     document.getElementById('autoplay-message').style.display = 'none';
-    if (!hasEnteredFullscreen && document.fullscreenEnabled) {
-        playerInstance.setFullscreen(true);
-        hasEnteredFullscreen = true;
-    }
 });
 </script>
 
